@@ -5,11 +5,12 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-route
 import Auth from './components/auth/Auth';
 import Callback from './components/auth/Callback';
 import Dashboard from './components/Dashboard';
+import PlaylistDetail from './components/PlayListDetail';
 
 function MainApp() {
   const navigate = useNavigate();
   return (
-    <div className="relative flex items-center justify-center rounded-xl ">
+    <div className="relative flex items-center justify-center rounded-xl min-h-screen">
       <div 
         onClick={() => navigate('/auth')}
         className="relative flex z-10 flex-col items-center text-white p-8 rounded-xl bg-white/10 backdrop-blur-md shadow-lg ring-1 ring-white/20 cursor-pointer hover:bg-white/20 transition-all duration-300"
@@ -33,6 +34,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/callback" element={<Callback />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/playlist/:id" element={<PlaylistDetail />} />
       </Routes>
     </Router>
   );
