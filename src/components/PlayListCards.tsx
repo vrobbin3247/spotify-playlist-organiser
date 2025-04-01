@@ -23,7 +23,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onClick }) => {
 
   return (
     <div 
-      className="bg-white/5 p-4 rounded-lg hover:bg-white/10 transition-all duration-300 cursor-pointer transform hover:scale-105"
+      className="bg-white/5 p-4 rounded-lg hover:bg-white/10 transition-all duration-300 cursor-pointer transform hover:scale-105 h-full"
       onClick={handleClick}
     >
       <div className="flex flex-col">

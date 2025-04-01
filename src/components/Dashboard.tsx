@@ -1,9 +1,10 @@
 // src/components/Dashboard.tsx
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
-import { getUserProfile, getUserPlaylists } from '../services/spotifyService';
+import { getUserProfile, getUserPlaylists, refreshAccessToken } from '../services/spotifyService';
 import spotifyLogo from "../assets/Spotify_Primary_Logo_RGB_White.png";
 import PlaylistCard from './PlayListCards';
 
@@ -18,26 +19,42 @@ function Dashboard() {
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        // Check if we have an access token
         const accessToken = localStorage.getItem('spotify_access_token');
         if (!accessToken) {
           navigate('/auth');
           return;
         }
-        
-        // Fetch user profile and playlists
-        const userProfile = await getUserProfile();
-        setUser(userProfile);
-        
-        const playlistsData = await getUserPlaylists();
-        setPlaylists(playlistsData.items || []);
+  
+        try {
+          const userProfile = await getUserProfile();
+          setUser(userProfile);
+          
+          const playlistsData = await getUserPlaylists();
+          setPlaylists(playlistsData.items || []);
+        } catch (error) {
+          // Try to refresh token if the error is 401
+          if (axios.isAxiosError(error) && error.response?.status === 401) {
+            await refreshAccessToken();
+            // Retry with new token
+            const userProfile = await getUserProfile();
+            setUser(userProfile);
+            
+            const playlistsData = await getUserPlaylists();
+            setPlaylists(playlistsData.items || []);
+          } else {
+            throw error;
+          }
+        }
       } catch (error) {
         console.error('Dashboard data loading error:', error);
         if (error instanceof Error) {
-          setError(error.message);
+          setError(error.message.includes('401') ? 'Session expired. Please login again.' : error.message);
         } else {
           setError('Failed to load dashboard data');
         }
+        // Clear tokens on error
+        localStorage.removeItem('spotify_access_token');
+        localStorage.removeItem('spotify_refresh_token');
       } finally {
         setIsLoading(false);
       }
@@ -95,8 +112,8 @@ function Dashboard() {
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center">
             <img src={spotifyLogo} alt="Spotify Logo" className="h-8 mr-2" />
-            <h1 className="text-2xl mr-1.5 font-bold text-white">Spotify</h1>
-            <h1 className="text-2xl text-white">Organizer</h1>
+            {/* <h1 className="text-2xl mr-1.5 font-bold text-white">Spotify</h1> */}
+            <h1 className="text-2xl font-bold text-white">Playlist Organizer</h1>
           </div>
           
           {user && (
@@ -202,23 +219,51 @@ function Dashboard() {
             </div>
             
             {playlists.length === 0 ? (
-              <div className="bg-white/5 p-6 rounded-lg text-center">
-                <p className="text-gray-300 mb-4">You don't have any playlists yet.</p>
-                <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full text-sm">
-                  Create Your First Playlist
-                </button>
+  <div className="bg-white/5 p-6 rounded-lg text-center">
+    <p className="text-gray-300 mb-4">You don't have any playlists yet.</p>
+    <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full text-sm">
+      Create Your First Playlist
+    </button>
+  </div>
+) : (
+  <div className="relative">
+    {/* Single scroll container for both rows */}
+    <div className="overflow-x-auto pb-4">
+      {/* Container that holds both rows */}
+      <div className="w-max space-y-4"> {/* w-max makes container only as wide as content */}
+        {/* First row - even indexes */}
+        <div className="flex space-x-4">
+          {playlists.map((playlist, index) => {
+            if (index % 2 !== 0) return null;
+            return (
+              <div key={playlist.id} className="flex-none w-64">
+                <PlaylistCard 
+                  playlist={playlist} 
+                  onClick={handlePlaylistClick}
+                />
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {playlists.map(playlist => (
-                  <PlaylistCard 
-                    key={playlist.id} 
-                    playlist={playlist} 
-                    onClick={handlePlaylistClick}
-                  />
-                ))}
+            );
+          })}
+        </div>
+        
+        {/* Second row - odd indexes */}
+        <div className="flex space-x-4">
+          {playlists.map((playlist, index) => {
+            if (index % 2 === 0) return null;
+            return (
+              <div key={playlist.id} className="flex-none w-64">
+                <PlaylistCard 
+                  playlist={playlist} 
+                  onClick={handlePlaylistClick}
+                />
               </div>
-            )}
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
           </div>
         </main>
       </div>

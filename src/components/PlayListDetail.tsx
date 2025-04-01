@@ -1,51 +1,7 @@
 // src/components/PlaylistDetail.tsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-// This would be in your spotifyService.ts
-const getPlaylistDetails = async (playlistId: string) => {
-  const accessToken = localStorage.getItem('spotify_access_token');
-  
-  if (!accessToken) {
-    throw new Error('No access token available');
-  }
-  
-  try {
-    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching playlist details:', error);
-    throw error;
-  }
-};
-
-// This would be in your spotifyService.ts
-const getPlaylistTracks = async (playlistId: string) => {
-  const accessToken = localStorage.getItem('spotify_access_token');
-  
-  if (!accessToken) {
-    throw new Error('No access token available');
-  }
-  
-  try {
-    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching playlist tracks:', error);
-    throw error;
-  }
-};
+import { getPlaylistDetails, getPlaylistTracks } from '../services/spotifyService';
 
 function PlaylistDetail() {
   const { id } = useParams<{ id: string }>();
@@ -54,16 +10,16 @@ function PlaylistDetail() {
   const [tracks, setTracks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const loadPlaylistData = async () => {
       if (!id) return;
-      
+
       try {
         setIsLoading(true);
         const playlistData = await getPlaylistDetails(id);
         setPlaylist(playlistData);
-        
+
         const tracksData = await getPlaylistTracks(id);
         setTracks(tracksData.items || []);
       } catch (error) {
@@ -77,10 +33,11 @@ function PlaylistDetail() {
         setIsLoading(false);
       }
     };
-    
+
     loadPlaylistData();
   }, [id]);
-  
+
+  // Rest of the component remains the same
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -91,14 +48,14 @@ function PlaylistDetail() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="p-8 bg-white/10 backdrop-blur-md rounded-xl text-center max-w-md">
           <h2 className="text-2xl font-bold text-white mb-4">Error</h2>
           <p className="text-red-400 mb-6">{error}</p>
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full"
           >
@@ -108,13 +65,13 @@ function PlaylistDetail() {
       </div>
     );
   }
-  
+
   if (!playlist) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="p-8 bg-white/10 backdrop-blur-md rounded-xl text-center max-w-md">
           <h2 className="text-2xl font-bold text-white mb-4">Playlist Not Found</h2>
-          <button 
+          <button
             onClick={() => navigate('/dashboard')}
             className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full"
           >
@@ -124,15 +81,12 @@ function PlaylistDetail() {
       </div>
     );
   }
-  
-  const visibleTracks = tracks.slice(0, 8);
-  const remainingTracks = tracks.slice(8);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-6">
       <div className="max-w-6xl mx-auto">
         {/* Back button */}
-        <button 
+        <button
           onClick={() => navigate('/dashboard')}
           className="mb-6 flex items-center text-white hover:text-green-400"
         >
@@ -145,9 +99,9 @@ function PlaylistDetail() {
         {/* Playlist header - now at the top */}
         <div className="flex items-start gap-6 mb-8">
           {playlist.images && playlist.images[0] ? (
-            <img 
-              src={playlist.images[0].url} 
-              alt={playlist.name} 
+            <img
+              src={playlist.images[0].url}
+              alt={playlist.name}
               className="w-48 h-48 object-cover rounded-lg shadow-xl"
             />
           ) : (
@@ -163,7 +117,7 @@ function PlaylistDetail() {
           <div className="flex flex-col justify-end">
             <p className="text-white uppercase text-xs font-bold mb-2">Playlist</p>
             <h1 className="text-5xl font-bold text-white mb-4">{playlist.name}</h1>
-            
+
             {playlist.description && (
               <p className="text-gray-300 text-sm mb-4">{playlist.description}</p>
             )}
@@ -173,26 +127,30 @@ function PlaylistDetail() {
               <span className="mx-1">•</span>
               <span>{tracks.length} songs</span>
             </div>
+
+            {/* Enhanced Organise button */}
+            <div className="mt-6 flex items-center gap-4">
+
+              {/* Organize button - more prominent but integrated */}
+              <button
+                className="px-6 py-3 bg-white text-black rounded-full 
+    text-base font-bold flex items-center gap-2 shadow-md 
+    hover:scale-105 hover:bg-green-500 transition-all duration-200"
+                onClick={() => console.log('Organise clicked')}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+                Organise Playlist
+              </button>
+
+              {/* Other standard controls like heart/like button can go here */}
+            </div>
           </div>
         </div>
 
-        {/* Action buttons */}
-        {/* <div className="flex items-center gap-4 mb-8">
-          <button className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full text-sm font-bold flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-            </svg>
-            Play
-          </button>
-          <button className="p-2 text-gray-300 hover:text-white">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-            </svg>
-          </button>
-        </div> */}
-
-         {/* Tracks container - now with fixed height and scroll */}
-         <div className="rounded-lg overflow-hidden">
+        {/* Tracks container - now with fixed width */}
+        <div className="rounded-lg overflow-hidden w-full">
           {/* Tracks header */}
           <div className="grid grid-cols-12 gap-4 px-4 py-2 border-b border-gray-700 text-gray-400 text-sm font-medium">
             <div className="col-span-1 text-center">#</div>
@@ -201,45 +159,45 @@ function PlaylistDetail() {
             <div className="col-span-2 text-right">Duration</div>
           </div>
 
-          {/* Scrollable tracks container */}
-          <div className="max-h-[calc(8*4.5rem)] overflow-y-auto"> {/* Approximately 8 tracks */}
+          {/* Scrollable tracks container with fixed width */}
+          <div className="max-h-[calc(8*4.5rem)] overflow-y-auto scrollbar w-full">
             {tracks.length === 0 ? (
               <div className="p-8 text-center text-gray-400">
                 This playlist has no tracks.
               </div>
             ) : (
               tracks.map((item, index) => (
-                <div 
-                  key={item.track.id || index} 
-                  className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-gray-700/50 group"
+                <div
+                  key={item.track.id || index}
+                  className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-gray-700/50 group w-full"
                 >
                   <div className="col-span-1 flex items-center justify-center text-gray-400 group-hover:text-white">
                     {index + 1}
                   </div>
-                  
-                  <div className="col-span-5 flex items-center">
+
+                  <div className="col-span-5 flex items-center min-w-0">
                     {item.track.album.images && item.track.album.images[2] ? (
-                      <img 
-                        src={item.track.album.images[2].url} 
-                        alt={item.track.album.name} 
-                        className="w-10 h-10 rounded mr-3"
+                      <img
+                        src={item.track.album.images[2].url}
+                        alt={item.track.album.name}
+                        className="w-10 h-10 rounded mr-3 flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-10 h-10 bg-gray-700 rounded mr-3" />
+                      <div className="w-10 h-10 bg-gray-700 rounded mr-3 flex-shrink-0" />
                     )}
-                    <div className="truncate">
+                    <div className="truncate w-full">
                       <div className="font-medium text-white truncate">{item.track.name}</div>
                       <div className="text-xs text-gray-400 truncate">
                         {item.track.album.name}
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="col-span-4 flex items-center text-gray-400 group-hover:text-white truncate">
+
+                  <div className="col-span-4 flex items-center text-gray-400 group-hover:text-white truncate min-w-0">
                     {item.track.artists.map((artist: any) => artist.name).join(', ')}
                   </div>
-                  
-                  <div className="col-span-2 flex items-center justify-end text-gray-400 group-hover:text-white">
+
+                  <div className="col-span-2 flex items-center justify-end text-gray-400 group-hover:text-white whitespace-nowrap">
                     {Math.floor(item.track.duration_ms / 60000)}:
                     {Math.floor((item.track.duration_ms % 60000) / 1000)
                       .toString()
@@ -254,5 +212,5 @@ function PlaylistDetail() {
     </div>
   );
 }
-      
+
 export default PlaylistDetail;
