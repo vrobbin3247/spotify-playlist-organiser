@@ -1,6 +1,8 @@
 // src/components/Dashboard.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Menu, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
 import { getUserProfile, getUserPlaylists } from '../services/spotifyService';
 import spotifyLogo from "../assets/Spotify_Primary_Logo_RGB_White.png";
 import PlaylistCard from './PlayListCards';
@@ -93,55 +95,110 @@ function Dashboard() {
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center">
             <img src={spotifyLogo} alt="Spotify Logo" className="h-8 mr-2" />
-            <h1 className="text-2xl font-bold text-white">Spotify Organizer</h1>
+            <h1 className="text-2xl mr-1.5 font-bold text-white">Spotify</h1>
+            <h1 className="text-2xl text-white">Organizer</h1>
           </div>
           
-          <div className="flex items-center">
-            {user && (
-              <div className="flex items-center mr-6">
-                {user.images && user.images[0] ? (
-                  <img 
-                    src={user.images[0].url} 
-                    alt={user.display_name} 
-                    className="w-8 h-8 rounded-full mr-2" 
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-2">
-                    <span className="text-white font-bold">{user.display_name?.substring(0, 1).toUpperCase()}</span>
+          {user && (
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <Menu.Button className="flex items-center text-sm rounded-full focus:outline-none">
+                  <div className="flex items-center">
+                    {user.images?.[0]?.url ? (
+                      <img 
+                        src={user.images[0].url} 
+                        alt={user.display_name} 
+                        className="w-8 h-8 rounded-full mr-2" 
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-2">
+                        <span className="text-white font-bold">
+                          {user.display_name?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-white">{user.display_name}</span>
+                    <ChevronDownIcon className="w-4 h-4 ml-1 text-gray-300" />
                   </div>
-                )}
-                <span className="text-white">{user.display_name}</span>
+                </Menu.Button>
               </div>
-            )}
-            
-            <button 
-              onClick={handleLogout}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm"
-            >
-              Logout
-            </button>
-          </div>
+
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                  <div className="px-1 py-1">
+                    {/* <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active ? 'bg-gray-700 text-white' : 'text-gray-200'
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          onClick={() => navigate('/profile')}
+                        >
+                          <UserIcon className="w-4 h-4 mr-2" />
+                          Profile
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active ? 'bg-gray-700 text-white' : 'text-gray-200'
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          onClick={() => navigate('/settings')}
+                        >
+                          <CogIcon className="w-4 h-4 mr-2" />
+                          Settings
+                        </button>
+                      )}
+                    </Menu.Item> */}
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`${
+                            active ? 'bg-red-500 text-white' : 'text-red-400'
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                          onClick={handleLogout}
+                        >
+                          <LogoutIcon className="w-4 h-4 mr-2" />
+                          Logout
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          )}
         </header>
-        
+
         {/* Main content */}
         <main>
-          <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl text-white mb-6">
+          {/* <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl text-white mb-6">
             <h2 className="text-2xl font-bold mb-4">Your Dashboard</h2>
             <p>Welcome to your Spotify Organizer! Here you can manage and organize your playlists.</p>
-          </div>
+          </div> */}
           
           {/* Playlists */}
           <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl text-white">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Your Playlists ({playlists.length})</h2>
-              <button 
+              {/* <button 
                 className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full text-sm flex items-center"
               >
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 New Playlist
-              </button>
+              </button> */}
             </div>
             
             {playlists.length === 0 ? (
@@ -166,6 +223,65 @@ function Dashboard() {
         </main>
       </div>
     </div>
+  );
+}
+  
+        
+        
+function ChevronDownIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
+
+function UserIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+  );
+}
+
+function CogIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
+function LogoutIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+    </svg>
   );
 }
 

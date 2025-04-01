@@ -126,7 +126,7 @@ function PlaylistDetail() {
   }
   
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 auto-rows-max">
       <div className="max-w-6xl mx-auto">
         <button 
           onClick={() => navigate('/dashboard')}
@@ -187,7 +187,7 @@ function PlaylistDetail() {
           {/* Tracks list */}
           <div className="md:w-2/3">
             <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
-              <h2 className="text-xl font-bold text-white mb-4">Tracks</h2>
+              <h2 className="text-xl text-center font-bold text-white mb-4">Tracks</h2>
               
               {tracks.length === 0 ? (
                 <p className="text-gray-300">This playlist has no tracks.</p>
