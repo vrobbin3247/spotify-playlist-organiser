@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaylistDetails, getPlaylistTracks } from '../services/spotifyService';
+import {OrganisePlaylist} from './OrganisePlaylist'
 
 function PlaylistDetail() {
   const { id } = useParams<{ id: string }>();
@@ -136,7 +137,7 @@ function PlaylistDetail() {
                 className="px-6 py-3 bg-white text-black rounded-full 
     text-base font-bold flex items-center gap-2 shadow-md 
     hover:scale-105 hover:bg-green-500 transition-all duration-200"
-                onClick={() => console.log('Organise clicked')}
+    onClick={() => navigate(`/organise/${id}`)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />

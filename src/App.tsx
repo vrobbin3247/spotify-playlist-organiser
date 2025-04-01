@@ -6,6 +6,7 @@ import Auth from './components/auth/Auth';
 import Callback from './components/auth/Callback';
 import Dashboard from './components/Dashboard';
 import PlaylistDetail from './components/PlayListDetail';
+import OrganisePlaylist from './components/OrganisePlaylist';
 
 function MainApp() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ function App() {
         <Route path="/auth/callback" element={<Callback />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/playlist/:id" element={<PlaylistDetail />} />
+        <Route path="/organise/:id" element={<OrganisePlaylist />} />
       </Routes>
     </Router>
   );
