@@ -15,14 +15,28 @@ function PlaylistDetail() {
   useEffect(() => {
     const loadPlaylistData = async () => {
       if (!id) return;
-
+      
       try {
         setIsLoading(true);
         const playlistData = await getPlaylistDetails(id);
         setPlaylist(playlistData);
-
+  
         const tracksData = await getPlaylistTracks(id);
         setTracks(tracksData.items || []);
+  
+        // Add this logging code
+        console.log('Tracks with preview URLs:', 
+          tracksData.items.filter(item => item.track?.preview_url).map(item => ({
+            name: item.track.name,
+            preview_url: item.track.preview_url
+          }))
+        );
+  
+        // Also log the total count
+        const totalTracks = tracksData.items.length;
+        const tracksWithPreview = tracksData.items.filter(item => item.track?.preview_url).length;
+        console.log(`Preview availability: ${tracksWithPreview}/${totalTracks} tracks have preview URLs`);
+  
       } catch (error) {
         console.error('Error loading playlist:', error);
         if (error instanceof Error) {
@@ -34,7 +48,7 @@ function PlaylistDetail() {
         setIsLoading(false);
       }
     };
-
+  
     loadPlaylistData();
   }, [id]);
 
