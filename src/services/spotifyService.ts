@@ -2,8 +2,25 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'https://api.spotify.com/v1';
-const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
+
+// Get environment variables in a way that works both locally and on Vercel
+const getEnvVariable = (key: string): string => {
+  // For client-side environment variables in Vite
+  if (import.meta.env[key]) {
+    return import.meta.env[key];
+  }
+  
+  // For environment variables in Vercel
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key];
+  }
+  
+  console.warn(`Environment variable ${key} not found`);
+  return '';
+};
+
+const CLIENT_ID = getEnvVariable('VITE_SPOTIFY_CLIENT_ID');
+const CLIENT_SECRET = getEnvVariable('VITE_SPOTIFY_CLIENT_SECRET');
 
 // Refresh access token using refresh token
 export const refreshAccessToken = async () => {
@@ -11,6 +28,10 @@ export const refreshAccessToken = async () => {
     
     if (!refreshToken) {
       throw new Error('No refresh token available');
+    }
+    
+    if (!CLIENT_ID || !CLIENT_SECRET) {
+      throw new Error('Spotify credentials not configured');
     }
     
     try {
@@ -102,7 +123,6 @@ export const getPlaylistTracks = async (playlistId: string) => {
   return makeSpotifyRequest(`${API_BASE_URL}/playlists/${playlistId}/tracks`);
 };
 
-
 export const createPlaylist = async (data: {
     name: string;
     description?: string;
@@ -119,11 +139,9 @@ export const createPlaylist = async (data: {
     });
   };
   
-  export const addTracksToPlaylist = async (playlistId: string, trackUris: string[]) => {
-    return makeSpotifyRequest(`${API_BASE_URL}/playlists/${playlistId}/tracks`, {
-      method: 'POST',
-      data: { uris: trackUris }
-    });
-  };
-  
- 
+export const addTracksToPlaylist = async (playlistId: string, trackUris: string[]) => {
+  return makeSpotifyRequest(`${API_BASE_URL}/playlists/${playlistId}/tracks`, {
+    method: 'POST',
+    data: { uris: trackUris }
+  });
+};
