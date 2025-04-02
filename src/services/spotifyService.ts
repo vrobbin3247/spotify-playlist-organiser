@@ -38,44 +38,49 @@ export const refreshAccessToken = async () => {
     }
   };
 
+  const getAccessToken = () => localStorage.getItem('spotify_access_token');
+  const getCurrentUserProfile = () => makeSpotifyRequest(`${API_BASE_URL}/me`);
+
 // Generic API request handler with token refresh capability
-const makeSpotifyRequest = async (url: string) => {
-  try {
-    const accessToken = localStorage.getItem('spotify_access_token');
-    
-    if (!accessToken) {
-      throw new Error('No access token available');
-    }
-    
-    const response = await axios.get(url, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+const makeSpotifyRequest = async (url: string, options: any = {}) => {
+    try {
+      const accessToken = getAccessToken();
+      if (!accessToken) throw new Error('No access token available');
+      
+      const response = await axios({
+        url,
+        method: options.method || 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        data: options.data
+      });
+      
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        try {
+          const newTokenData = await refreshAccessToken();
+          const retryResponse = await axios({
+            url,
+            method: options.method || 'GET',
+            headers: {
+              'Authorization': `Bearer ${newTokenData.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            data: options.data
+          });
+          return retryResponse.data;
+        } catch (refreshError) {
+          localStorage.removeItem('spotify_access_token');
+          localStorage.removeItem('spotify_refresh_token');
+          throw new Error('Authentication failed');
+        }
       }
-    });
-    
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      // Try to refresh the token
-      try {
-        const newTokenData = await refreshAccessToken();
-        // Retry the request with the new token
-        const retryResponse = await axios.get(url, {
-          headers: {
-            'Authorization': `Bearer ${newTokenData.access_token}`
-          }
-        });
-        return retryResponse.data;
-      } catch (refreshError) {
-        // If refresh fails, clear tokens and throw error
-        localStorage.removeItem('spotify_access_token');
-        localStorage.removeItem('spotify_refresh_token');
-        throw new Error('Authentication failed');
-      }
+      throw error;
     }
-    throw error;
-  }
-};
+  };
 
 // Get user profile information
 export const getUserProfile = async () => {
@@ -96,3 +101,29 @@ export const getPlaylistDetails = async (playlistId: string) => {
 export const getPlaylistTracks = async (playlistId: string) => {
   return makeSpotifyRequest(`${API_BASE_URL}/playlists/${playlistId}/tracks`);
 };
+
+
+export const createPlaylist = async (data: {
+    name: string;
+    description?: string;
+    public?: boolean;
+  }) => {
+    const user = await getCurrentUserProfile();
+    return makeSpotifyRequest(`${API_BASE_URL}/users/${user.id}/playlists`, {
+      method: 'POST',
+      data: {
+        name: data.name,
+        description: data.description || '',
+        public: data.public || false
+      }
+    });
+  };
+  
+  export const addTracksToPlaylist = async (playlistId: string, trackUris: string[]) => {
+    return makeSpotifyRequest(`${API_BASE_URL}/playlists/${playlistId}/tracks`, {
+      method: 'POST',
+      data: { uris: trackUris }
+    });
+  };
+  
+ 
