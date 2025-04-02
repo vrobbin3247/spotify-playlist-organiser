@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { getUserProfile, getUserPlaylists, refreshAccessToken } from '../services/spotifyService';
-import spotifyLogo from "../assets/Spotify_Primary_Logo_RGB_White.png";
+import spotifyLogo from "../assets/Spotify_Primary_Logo_RGB_Green.png";
 import PlaylistCard from './PlayListCards';
 
 function Dashboard() {
@@ -113,7 +113,7 @@ function Dashboard() {
           <div className="flex items-center">
             <img src={spotifyLogo} alt="Spotify Logo" className="h-8 mr-2" />
             {/* <h1 className="text-2xl mr-1.5 font-bold text-white">Spotify</h1> */}
-            <h1 className="text-2xl font-bold text-white">Playlist Organizer</h1>
+            <h1 className="text-2xl font-bold text-spotify-green">Playlist Organizer</h1>
           </div>
           
           {user && (

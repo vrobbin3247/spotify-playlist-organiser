@@ -26,12 +26,19 @@ export default function OrganisePlaylist() {
     const [showModal, setShowModal] = useState(false);
     const [selectedDestination, setSelectedDestination] = useState<number | null>(null);
     const [playlistName, setPlaylistName] = useState('');
-    const [createdPlaylists, setCreatedPlaylists] = useState<Record<number, { name: string, gradient: string }>>({});
+    const [playlistDescription, setPlaylistDescription] = useState(''); // Add this line
+    const [isPublic, setIsPublic] = useState(false);
+    const [createdPlaylists, setCreatedPlaylists] = useState<Record<number, {
+        name: string,
+        description: string,
+        isPublic: boolean,
+        gradient: string
+    }>>({});
     const [playlistTracks, setPlaylistTracks] = useState<Record<number, Track[]>>({});
     const [availableTracks, setAvailableTracks] = useState<Track[]>([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState('');
     const navigate = useNavigate();
-
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -62,17 +69,17 @@ export default function OrganisePlaylist() {
 
     const getVisibleCardIndexes = (trackList: Track[]) => {
         if (!trackList.length) return [];
-        
+
         // Create an array of possible indices
         const indices = [];
-        
+
         // Only add indices if we haven't exceeded the length of the track list
         for (let i = 0; i < 6; i++) {
             if (i < trackList.length) {
                 indices.push((currentIndex + i) % trackList.length);
             }
         }
-        
+
         // Return only unique indices
         return [...new Set(indices)];
     };
@@ -129,8 +136,8 @@ export default function OrganisePlaylist() {
 
                     const newPlaylist = await createPlaylist({
                         name: playlistData.name,
-                        description: `Organized from ${playlist?.name}`,
-                        public: false
+                        description: playlistData.description || `Organized from ${playlist?.name}`,
+                        public: playlistData.isPublic || false
                     });
 
                     await addTracksToPlaylist(newPlaylist.id, trackUris);
@@ -164,7 +171,7 @@ export default function OrganisePlaylist() {
         <div className="min-h-screen p-6">
             <div className="max-w-7xl mx-auto">
                 <h1 className="text-3xl font-bold text-white mb-6">
-                    Organising: {playlist?.name}
+                    {playlist?.name}
                 </h1>
 
                 {/* Destination cards */}
@@ -178,10 +185,10 @@ export default function OrganisePlaylist() {
                                 onDrop={(e) => handleDrop(e, num)}
                                 onDragOver={handleDragOver}
                                 className={`relative rounded-xl p-6 h-64 flex flex-col items-center justify-center 
-                  transition-all duration-300 shadow-lg
+                  transition-all duration-100 shadow-lg
                   ${isCreated ?
                                         `bg-gradient-to-br ${createdPlaylists[num].gradient} cursor-default` :
-                                        `backdrop-blur-lg bg-white/10 border border-white/20 hover:border-green-400/50 cursor-pointer`
+                                        `backdrop-blur-lg bg-white/10 border border-white/20 hover:text-spotify-green hover:border-green-400/50 cursor-pointer`
                                     }`}
                             >
                                 {isCreated ? (
@@ -204,68 +211,88 @@ export default function OrganisePlaylist() {
                     })}
                 </div>
 
+
                 {/* Track display - Spotify themed cards */}
                 <div className="relative h-[400px] w-full max-w-4xl mx-auto mb-12">
-                  <div className="flex items-center justify-center h-full">
-                    {availableTracks.length > 0 ? (
-                      <div className="flex items-center">
-                        {visibleIndexes.map((index, i) => {
-                          const track = availableTracks[index];
-                          if (!track) return null;
-                          
-                          return (
-                            <motion.div
-                              key={`${track.track.id}-${i}`}
-                              draggable
-                              onDragStart={(e) => handleDragStart(e, track)}
-                              className={`spotify-card ${i !== 0 ? '-ml-16' : ''}`}
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3, delay: i * 0.1 }}
-                              whileHover={{ y: -20, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.5)" }}
-                            >
-                              <div className="album-cover">
-                                {track.track.album?.images?.[0]?.url ? (
-                                  <img 
-                                    src={track.track.album.images[0].url}
-                                    alt={track.track.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="placeholder-cover flex items-center justify-center bg-gray-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <path d="M9 18V5l12-2v13"></path>
-                                      <circle cx="6" cy="18" r="3"></circle>
-                                      <circle cx="18" cy="16" r="3"></circle>
-                                    </svg>
-                                  </div>
-                                )}
-                                {/* <div className="play-icon">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
-                                </div> */}
-                              </div>
-                              <div className="track-info">
-                                <h3 className="track-title">{track.track.name}</h3>
-                                <p className="track-artist">
-                                  {track.track.artists.map(artist => artist.name).join(', ')}
-                                </p>
-                              </div>
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-center text-gray-400">
-                        All tracks have been organized!
-                      </div>
-                    )}
-                  </div>
-                </div>
 
+                    <div className="relative flex items-center justify-center h-full">
+                        <button onClick={prevTrack} className="absolute left-4 z-10 p-2 rounded-full bg-black/50 hover:bg-white/20 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+
+                        <button onClick={nextTrack} className="absolute right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-white/20 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        {availableTracks.length > 0 ? (
+                            <div className="relative flex items-center">
+                                <AnimatePresence>
+                                    {visibleIndexes.map((index, i) => {
+                                        const track = availableTracks[index];
+                                        if (!track) return null;
+
+                                        return (
+                                            <motion.div
+                                                key={track.track.id}
+                                                draggable
+                                                onDragStart={(e) => handleDragStart(e, track)}
+                                                layoutId={track.track.id} // 🔥 Prevents flickering on reorder
+                                                className={`spotify-card absolute top-0 transition-transform duration-100 ease-in-out ${i !== 0 ? '-ml-16' : ''}`}
+                                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.8, x: -30 }}
+                                                transition={{ duration: 0.1, ease: "easeInOut" }} // ⏳ Longer transition for smoothness
+                                                whileHover={{ y: -10, scale: 1.05, boxShadow: "0 12px 20px rgba(0, 0, 0, 0.3)" }}
+                                                style={{ zIndex: visibleIndexes.length - i }} // Maintain stacking
+                                            >
+                                                <div className="album-cover">
+                                                    {track.track.album?.images?.[0]?.url ? (
+                                                        <img
+                                                            src={track.track.album.images[0].url}
+                                                            alt={track.track.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="placeholder-cover flex items-center justify-center bg-gray-800">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <path d="M9 18V5l12-2v13"></path>
+                                                                <circle cx="6" cy="18" r="3"></circle>
+                                                                <circle cx="18" cy="16" r="3"></circle>
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="track-info">
+                                                    <h3 className="track-title">{track.track.name}</h3>
+                                                    <p className="track-artist">
+                                                        {track.track.artists.map(artist => artist.name).join(', ')}
+                                                    </p>
+                                                </div>
+                                            </motion.div>
+                                        );
+                                    })}
+                                </AnimatePresence>
+                            </div>
+
+                        ) : (
+                            <div className="text-center text-gray-400">
+                                All tracks have been organized!
+                            </div>
+
+                        )}
+
+                    </div>
+                    <div className="flex justify-center mt-4">
+                        <div className="bg-spotify-green px-4 py-2 rounded-full text-black text-m">
+                            {availableTracks.length} track{availableTracks.length !== 1 ? 's' : ''} remaining
+                        </div>
+                    </div>
+                </div>
                 {/* Spotify-themed card styles */}
-                <style jsx>{`
+                <style>{`
                   .spotify-card {
                     display: flex;
                     flex-direction: column;
@@ -356,21 +383,55 @@ export default function OrganisePlaylist() {
 
                 {/* Create Playlist Modal */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-                        <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md border border-gray-600">
-                            <h2 className="text-xl font-bold text-white mb-4">
-                                Name Your Playlist #{selectedDestination}
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50">
+                        <div className="bg-gray-900/90 rounded-2xl p-6 w-full max-w-md border border-gray-700 shadow-xl transition-all transform scale-105">
+                            <h2 className="text-2xl font-semibold text-white mb-4">
+                                Create Playlist #{selectedDestination}
                             </h2>
 
                             <div className="mb-4">
-                                <label className="block text-gray-300 text-sm mb-2">Playlist Name</label>
+                                <label className="block text-gray-400 text-sm mb-2">Playlist Name*</label>
                                 <input
                                     type="text"
                                     value={playlistName}
-                                    onChange={(e) => setPlaylistName(e.target.value)}
-                                    className="w-full bg-gray-700 text-white rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    onChange={(e) => {
+                                        setPlaylistName(e.target.value);
+                                        setError(''); // Remove error when user types
+                                    }}
+                                    className={`w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none border transition-all ${error ? 'border-red-500 focus:ring-2 focus:ring-red-500' : 'border-gray-700 focus:ring-2 focus:ring-green-500'
+                                        }`}
                                     placeholder="My Awesome Playlist"
+                                    required
                                 />
+                                {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-400 text-sm mb-2">Description</label>
+                                <textarea
+                                    value={playlistDescription}
+                                    onChange={(e) => setPlaylistDescription(e.target.value)}
+                                    className="w-full bg-gray-800 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-700 transition"
+                                    placeholder="What's this playlist about?"
+                                    rows={3}
+                                />
+                            </div>
+
+                            <div className="mb-6 flex items-center justify-between">
+                                <label className="block text-gray-400 text-sm">Visibility</label>
+                                <div className="flex items-center">
+                                    <span className="mr-2 text-gray-400">Private</span>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={isPublic}
+                                            onChange={() => setIsPublic(!isPublic)}
+                                        />
+                                        <div className="w-12 h-7 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[3px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                                    </label>
+                                    <span className="ml-2 text-gray-400">Public</span>
+                                </div>
                             </div>
 
                             <div className="flex justify-end gap-3">
@@ -378,26 +439,37 @@ export default function OrganisePlaylist() {
                                     onClick={() => {
                                         setShowModal(false);
                                         setPlaylistName('');
+                                        setPlaylistDescription('');
+                                        setIsPublic(false);
+                                        setError('');
                                     }}
-                                    className="px-4 py-2 text-white hover:bg-gray-700 rounded-full"
+                                    className="px-4 py-2 text-white bg-gray-700 hover:bg-gray-600 rounded-full transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={() => {
+                                        if (!playlistName.trim()) {
+                                            setError('Playlist name is required');
+                                            return;
+                                        }
                                         const gradient = getRandomGradient();
                                         setCreatedPlaylists(prev => ({
                                             ...prev,
                                             [selectedDestination!]: {
                                                 name: playlistName,
+                                                description: playlistDescription,
+                                                isPublic,
                                                 gradient: gradient
                                             }
                                         }));
                                         setShowModal(false);
                                         setPlaylistName('');
+                                        setPlaylistDescription('');
+                                        setIsPublic(false);
+                                        setError('');
                                     }}
-                                    className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full"
-                                    disabled={!playlistName.trim()}
+                                    className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-medium rounded-full shadow-md transition-all"
                                 >
                                     Create
                                 </button>
