@@ -1,7 +1,8 @@
-import React from 'react';
+import * as React from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+
 import "./App.css";
 import spotifyLogo from "./assets/Spotify_Full_Logo_RGB_White.png";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Auth from './components/auth/Auth';
 import Callback from './components/auth/Callback';
 import Dashboard from './components/Dashboard';
@@ -9,7 +10,8 @@ import PlaylistDetail from './components/PlayListDetail';
 import OrganisePlaylist from './components/OrganisePlaylist';
 
 function MainApp() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // FIX: Import and use it correctly
+
   return (
     <div className="relative flex items-center justify-center rounded-xl min-h-screen">
       <div 

@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaylistDetails, getPlaylistTracks } from '../services/spotifyService';
-import {OrganisePlaylist} from './OrganisePlaylist'
 
 function PlaylistDetail() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +25,7 @@ function PlaylistDetail() {
   
         // Add this logging code
         console.log('Tracks with preview URLs:', 
-          tracksData.items.filter(item => item.track?.preview_url).map(item => ({
+          tracksData.items.filter((item: { track: { preview_url: any; }; }) => item.track?.preview_url).map((item: { track: { name: any; preview_url: any; }; }) => ({
             name: item.track.name,
             preview_url: item.track.preview_url
           }))
@@ -34,7 +33,7 @@ function PlaylistDetail() {
   
         // Also log the total count
         const totalTracks = tracksData.items.length;
-        const tracksWithPreview = tracksData.items.filter(item => item.track?.preview_url).length;
+        const tracksWithPreview = tracksData.items.filter((item: { track: { preview_url: any; }; }) => item.track?.preview_url).length;
         console.log(`Preview availability: ${tracksWithPreview}/${totalTracks} tracks have preview URLs`);
   
       } catch (error) {

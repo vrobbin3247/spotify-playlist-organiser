@@ -7,14 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface Track {
     track: {
-        id: string;
-        name: string;
-        artists: Array<{ name: string }>;
-        album: {
-            images: Array<{ url: string }>;
-        };
+      id: string;
+      name: string;
+      artists: Array<{ name: string }>;
+      album: {
+        images: Array<{ url: string }>;
+      };
     };
-}
+  }
 
 export default function OrganisePlaylist() {
     const { id } = useParams<{ id: string }>();
@@ -45,7 +45,7 @@ export default function OrganisePlaylist() {
                 const playlistData = await getPlaylistDetails(id!);
                 const tracksData = await getPlaylistTracks(id!);
                 setPlaylist(playlistData);
-                const validTracks = tracksData.items.filter(item => item.track) as Track[];
+                const validTracks = tracksData.items.filter((item: { track: any; }) => item.track) as Track[];
                 setTracks(validTracks);
                 setAvailableTracks(validTracks);
             } catch (error) {
@@ -86,24 +86,24 @@ export default function OrganisePlaylist() {
 
     const visibleIndexes = getVisibleCardIndexes(availableTracks);
 
-    const handleDragStart = (e: React.DragEvent, track: Track) => {
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, track: Track) => {
         e.dataTransfer.setData('track', JSON.stringify(track));
-    };
+      };
 
-    const handleDrop = (e: React.DragEvent, playlistNumber: number) => {
+      const handleDrop = (e: React.DragEvent<HTMLDivElement>, playlistNumber: number) => {
         e.preventDefault();
         if (!createdPlaylists[playlistNumber]) return;
-
+      
         const trackData = e.dataTransfer.getData('track');
-        const track = JSON.parse(trackData) as Track;
-
+        const track: Track = JSON.parse(trackData);
+      
         setPlaylistTracks(prev => ({
-            ...prev,
-            [playlistNumber]: [...(prev[playlistNumber] || []), track]
+          ...prev,
+          [playlistNumber]: [...(prev[playlistNumber] || []), track]
         }));
-
+      
         setAvailableTracks(prev => prev.filter(t => t.track.id !== track.track.id));
-    };
+      };
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
@@ -131,7 +131,7 @@ export default function OrganisePlaylist() {
         try {
             const results = await Promise.all(
                 Object.entries(createdPlaylists).map(async ([playlistNum, playlistData]) => {
-                    const trackUris = playlistTracks[playlistNum]?.map(track => `spotify:track:${track.track.id}`) || [];
+                    const trackUris = playlistTracks[playlistNum]?.map((track: { track: { id: any; }; }) => `spotify:track:${track.track.id}`) || [];
                     if (trackUris.length === 0) return null;
 
                     const newPlaylist = await createPlaylist({
