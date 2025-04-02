@@ -5,7 +5,6 @@ const API_BASE_URL = 'https://api.spotify.com/v1';
 // Use Vite's way of accessing environment variables
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string;
 const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET as string;
-const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI as string;
 
 // Refresh access token using refresh token
 export const refreshAccessToken = async () => {
