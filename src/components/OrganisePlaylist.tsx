@@ -19,10 +19,10 @@ interface Track {
 export default function OrganisePlaylist() {
     const { id } = useParams<{ id: string }>();
     const [playlist, setPlaylist] = useState<any>(null);
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const [_tracks, setTracks] = useState<Track[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [direction, setDirection] = useState(0);
+    const [_direction, setDirection] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [selectedDestination, setSelectedDestination] = useState<number | null>(null);
     const [playlistName, setPlaylistName] = useState('');
@@ -131,7 +131,7 @@ export default function OrganisePlaylist() {
         try {
             const results = await Promise.all(
                 Object.entries(createdPlaylists).map(async ([playlistNum, playlistData]) => {
-                    const trackUris = playlistTracks[playlistNum]?.map((track: { track: { id: any; }; }) => `spotify:track:${track.track.id}`) || [];
+                    const trackUris = playlistTracks[playlistNum as number]?.map((track: { track: { id: any; }; }) => `spotify:track:${track.track.id}`) || [];
                     if (trackUris.length === 0) return null;
 
                     const newPlaylist = await createPlaylist({
@@ -238,7 +238,7 @@ export default function OrganisePlaylist() {
                                             <motion.div
                                                 key={track.track.id}
                                                 draggable
-                                                onDragStart={(e) => handleDragStart(e, track)}
+                                                onDragStart={(e) => handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, track)}
                                                 layoutId={track.track.id} // 🔥 Prevents flickering on reorder
                                                 className={`spotify-card absolute top-0 transition-transform duration-100 ease-in-out ${i !== 0 ? '-ml-16' : ''}`}
                                                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
