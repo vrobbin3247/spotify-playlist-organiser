@@ -1,54 +1,67 @@
-# React + TypeScript + Vite
+# 🎵 Spotify Playlist Organizer 🎶
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A **Vite + React + TypeScript** project that allows users to organize their Spotify playlists by creating multiple sub-playlists and categorizing tracks with a **drag-and-drop** feature. 🎧
 
-Currently, two official plugins are available:
+## 🚀 Features
+- **🔑 Spotify Authentication**: Log in using your Spotify account.
+- **📂 Access & Modify Playlists**: Fetch user playlists and reorganize them.
+- **🎼 Create Sub-Playlists**: Create up to 4 new playlists from an existing one.
+- **🖱️ Drag & Drop Tracks**: Move tracks from the original playlist to the newly created playlists.
+- **💻 Responsive UI**: Styled with **Tailwind CSS** for a clean and intuitive design.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack
+- **Frontend**: Vite + React + TypeScript
+- **Styling**: Tailwind CSS
+- **Authentication & API**: Spotify Web API
 
-## Expanding the ESLint configuration
+## 📦 Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
+- **📌 Node.js** (>= 16.0)
+- **🔑 Spotify Developer Account**
+- **🛠️ Spotify API Client ID & Secret**
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Steps
+1. **📥 Clone the repository**
+   ```sh
+   git clone https://github.com/yourusername/spotify-playlist-organizer.git
+   cd spotify-playlist-organizer
+   ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. **📌 Install dependencies**
+   ```sh
+   npm install
+   ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3. **📝 Set up environment variables**
+   Create a `.env` file in the root directory and add:
+   ```env
+   VITE_SPOTIFY_CLIENT_ID=your_client_id
+   VITE_SPOTIFY_REDIRECT_URI=http://localhost:5173/callback
+   ```
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+4. **▶️ Run the development server**
+   ```sh
+   npm run dev
+   ```
+
+## 🎯 Usage
+1. **🔑 Log in** using your Spotify account.
+2. **🎵 Select a playlist** to organize.
+3. **➕ Create up to 4 sub-playlists.**
+4. **🖱️ Drag and drop** tracks from the original playlist to the sub-playlists.
+5. **💾 Save** the newly organized playlists to Spotify.
+
+## 📜 License
+📝 MIT License
+
+## 🙌 Acknowledgments
+- **🎶 Spotify Web API** for authentication and playlist management.
+- **⚡ Vite, React, and Tailwind** for a fast and smooth development experience.
+
+## 🤝 Contributing
+Feel free to submit pull requests or report issues! 🚀
+
+---
+Happy organizing! 🎧🎵
+
