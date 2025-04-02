@@ -131,7 +131,7 @@ export default function OrganisePlaylist() {
         try {
             const results = await Promise.all(
                 Object.entries(createdPlaylists).map(async ([playlistNum, playlistData]) => {
-                    const trackUris = playlistTracks[playlistNum as number]?.map((track: { track: { id: any; }; }) => `spotify:track:${track.track.id}`) || [];
+                    const trackUris = playlistTracks[Number(playlistNum)]?.map((track: { track: { id: any; }; }) => `spotify:track:${track.track.id}`) || [];
                     if (trackUris.length === 0) return null;
 
                     const newPlaylist = await createPlaylist({
