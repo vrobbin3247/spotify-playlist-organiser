@@ -2,6 +2,8 @@
 
 A **Vite + React + TypeScript** project that allows users to organize their Spotify playlists by creating multiple sub-playlists and categorizing tracks with a **drag-and-drop** feature. 🎧
 
+<img src="https://raw.githubusercontent.com/vrobbin3247/hosted-media/main/spotify/spotify_organiser_playlist_sorting.gif" width="80%" alt="working" />
+
 ## 🚀 Features
 - **🔑 Spotify Authentication**: Log in using your Spotify account.
 - **📂 Access & Modify Playlists**: Fetch user playlists and reorganize them.
