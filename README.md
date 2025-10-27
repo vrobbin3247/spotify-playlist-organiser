@@ -1,4 +1,5 @@
 # 🎵 Spotify Playlist Organizer 🎶
+![Badge](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgithub.com%2Fvrobbin3247%2Fspotify-playlist-organiser&label=views&icon=github&color=%23198754&message=&style=flat-square&tz=UTC)
 
 A **Vite + React + TypeScript** project that allows users to organize their Spotify playlists by creating multiple sub-playlists and categorizing tracks with a **drag-and-drop** feature. 🎧
 
